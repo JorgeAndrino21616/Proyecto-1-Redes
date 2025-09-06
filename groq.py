@@ -4,7 +4,7 @@ import os, json, requests
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_CHAT_URL = "https://api.groq.com/openai/v1/chat/completions"
-MODEL = os.getenv("GROQ_MODEL", "llama-3.1-70b-versatile")  
+MODEL = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")  
 
 SYSTEM = """You are a strict intent extractor for League of Legends.
 Input: free text like "I want to play Darius tank against Garen, Maokai, Ahri, Jinx, Lulu".
@@ -26,7 +26,8 @@ def _fallback(text: str):
 def parse_intent_text(text: str):
     if not GROQ_API_KEY:
         return _fallback(text)
-    headers = {"Authorization": f"Bearer {GROQ_API_KEY}"}
+    headers = {"Authorization": f"Bearer {GROQ_API_KEY}",
+               "Content_Type": "application/json"}
     payload = {"model": MODEL, "temperature": 0, "messages": [
         {"role":"system","content":SYSTEM},
         {"role":"user","content":text}
