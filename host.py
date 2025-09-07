@@ -36,16 +36,16 @@ def main():
 
     try:
         print("\n=== League of Legends Champion Builder ===")
-        ally = ask_input_nonempty("Your champion (e.g. Darius): ")
-        characteristic = ask_input_nonempty("Characteristic (e.g. tank, AD, AP, bruiser): ")
+        ally = ask_input_nonempty("Your champion: ")
+        characteristic = ask_input_nonempty("Characteristic: ")
 
         enemies = None
         while enemies is None:
-            s = ask_input_nonempty("Enter 5 enemy champions separated by commas (e.g. Garen, Maokai, Ahri, Jinx, Lulu): ")
+            s = ask_input_nonempty("Enter 5 enemy champions separated by commas: ")
             enemies = parse_enemies(s)
 
         ddragon_version = "latest"
-        lang = "en_US"  # always fixed
+        lang = "en_US"  
 
         print("\nFetching static data from DDragon...")
         print(call_mcp(lol_proc, "fetch_static_data", {
