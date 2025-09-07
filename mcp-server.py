@@ -65,9 +65,9 @@ def rpc_suggest_items(params: Dict[str, Any]) -> Dict[str, Any]:
 
 
 HANDLERS = {
-    "set_matchup": rpc_set_matchup,
+    "matchup": rpc_set_matchup,
     "fetch_static_data": rpc_fetch_static_data,
-    "analyze_enemy_comp": rpc_analyze_enemy_comp,
+    "analyze_enemies": rpc_analyze_enemy_comp,
     "suggest_runes": rpc_suggest_runes,
     "suggest_summoners": rpc_suggest_summoners,
     "suggest_items": rpc_suggest_items,
