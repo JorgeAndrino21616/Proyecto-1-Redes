@@ -1,3 +1,5 @@
+Se necesita tener una API Key de Groq, se le tiene que agregar a groq.py y llm_client.py antes de correr host.py
+
 Ejemplo de funcionamiento:
 
 === League of Legends Champion Builder ===
