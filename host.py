@@ -1,34 +1,79 @@
+# Para correrlo, correr antes los API con una key de GROQ, en GROQ_API_KEY
 
-import os
+import os, sys
 from llm_client import ask_llm
 from mcp_client import start_mcp, call_mcp
 
-SESSION = []
+def ask_input_nonempty(prompt):
+    while True:
+        v = input(prompt).strip()
+        if v:
+            return v
+        print("Input cannot be empty.")
 
-def chat_user(msg):
-    SESSION.append({"role":"user","content":msg})
-    ans = ask_llm(SESSION)
-    SESSION.append({"role":"assistant","content":ans})
-    return ans
+def parse_enemies(s):
+    parts = [p.strip() for p in s.split(",") if p.strip()]
+    if len(parts) != 5:
+        print("You must enter exactly 5 enemy champions separated by commas. Example: Garen, Maokai, Ahri, Jinx, Lulu")
+        return None
+    return parts
+
+def build_matchup_text(ally_champ, characteristic, enemies):
+    return f"I want to play {ally_champ} {characteristic} against {', '.join(enemies)}"
 
 def main():
-    lol_proc = start_mcp(["python","mcp_server.py"])
+    here = os.path.dirname(__file__)
+    server = (
+        os.path.join(here, "mcp-server.py")
+        if os.path.exists(os.path.join(here, "mcp-server.py"))
+        else os.path.join(here, "mcp_server.py")
+    )
+    if not os.path.exists(server):
+        print(f"Could not find MCP server script: {server}")
+        sys.exit(1)
 
-    print("LLM:", chat_user("What is League of Legends?"))
-    print("LLM (context):", chat_user("And what is the 'tank' role in general?"))
+    lol_proc = start_mcp([sys.executable, server])
 
-    print("\n== lol-build-advisor ==")
-    print(call_mcp(lol_proc, "fetch_static_data", {"ddragon_version":"latest","lang":"en_US"}))
-    print(call_mcp(lol_proc, "set_matchup", {
-        "text": "I want to play Darius tank against Garen, Maokai, Ahri, Jinx, and Lulu"
-    }))
-    print(call_mcp(lol_proc, "analyze_enemy_comp", {}))
-    print(call_mcp(lol_proc, "suggest_runes", {}))
-    print(call_mcp(lol_proc, "suggest_summoners", {}))
-    print(call_mcp(lol_proc, "suggest_items", {}))
-    print(call_mcp(lol_proc, "report", {"out_dir":"./reports/demo"}))
+    try:
+        print("\n=== League of Legends Champion Builder ===")
+        ally = ask_input_nonempty("Your champion (e.g. Darius): ")
+        characteristic = ask_input_nonempty("Characteristic (e.g. tank, AD, AP, bruiser): ")
 
-    lol_proc.terminate()
+        enemies = None
+        while enemies is None:
+            s = ask_input_nonempty("Enter 5 enemy champions separated by commas (e.g. Garen, Maokai, Ahri, Jinx, Lulu): ")
+            enemies = parse_enemies(s)
+
+        ddragon_version = "latest"
+        lang = "en_US"  # always fixed
+
+        print("\nFetching static data from DDragon...")
+        print(call_mcp(lol_proc, "fetch_static_data", {
+            "ddragon_version": ddragon_version,
+            "lang": lang
+        }))
+
+        print("Setting up the matchup...")
+        text = build_matchup_text(ally, characteristic, enemies)
+        print(call_mcp(lol_proc, "matchup", {"text": text}))
+
+        print("Analyzing enemy composition...")
+        print(call_mcp(lol_proc, "analyze_enemies", {}))
+
+        print("Suggested RUNES:")
+        print(call_mcp(lol_proc, "suggest_runes", {}))
+
+        print("Suggested SUMMONER SPELLS:")
+        print(call_mcp(lol_proc, "suggest_summoners", {}))
+
+        print("Suggested ITEMS:")
+        print(call_mcp(lol_proc, "suggest_items", {}))
+
+        print("\nDone.")
+    finally:
+        lol_proc.terminate()
 
 if __name__ == "__main__":
     main()
+
+

@@ -2,7 +2,7 @@
 
 import os, json, requests
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_API_KEY = ""
 GROQ_CHAT_URL = "https://api.groq.com/openai/v1/chat/completions"
 MODEL = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")  
 
