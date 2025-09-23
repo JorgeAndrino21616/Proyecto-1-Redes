@@ -1,9 +1,10 @@
 
+Se puede utilizar el bot de Groq con /llm y se usa lol para utilizar el lol-champio-builder
 
 Ejemplo de funcionamiento:
 
 === Host MCP — type /help for commands ===
-> /use lol
+```> /use lol
 > /call lol initialize {}
 {
   "serverInfo": {
@@ -85,4 +86,4 @@ Ejemplo de funcionamiento:
       "Ghost"
     ]
   }
-}
+}```
