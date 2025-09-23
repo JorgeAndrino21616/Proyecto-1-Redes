@@ -72,13 +72,16 @@ def main():
     h = Host()
     print(BANNER)
     here = os.path.dirname(__file__)
-    default_lol = f"{sys.executable} {os.path.join(here, 'mcp-server.py')}"
-    default_fs  = "python -m mcp_servers.filesystem"
-    default_git = "python -m mcp_servers.git"
+    default_lol     = f"{sys.executable} {os.path.join(here, 'mcp-server.py')}"
+    default_fs      = "python -m mcp_servers.filesystem"
+    default_git     = "python -m mcp_servers.git"
+    default_arx   = f"{sys.executable} {os.path.join(here, 'mcp-server-compañero-2.py')}"
+
+
     try:
         while True:
             line = input("> ").strip()
-            if not line: 
+            if not line:
                 continue
             if line == "/help":
                 print("""Commands:
@@ -94,18 +97,19 @@ Presets:
   /use lol
   /use fs
   /use git
+  /use arx
 """)
                 continue
             if line == "/exit":
                 break
             if line == "/history":
-                h.print_history(); 
+                h.print_history()
                 continue
             if line == "/mcp_log":
-                print(str(LOG_FILE)); 
+                print(str(LOG_FILE))
                 continue
             if line.startswith("/llm "):
-                h.do_llm(line[5:].strip()); 
+                h.do_llm(line[5:].strip())
                 continue
             if line.startswith("/use "):
                 parts = shlex.split(line)
@@ -116,12 +120,14 @@ Presets:
                         h.do_use("fs", default_fs); continue
                     if parts[1] == "git":
                         h.do_use("git", default_git); continue
+                    if parts[1] == "arx":
+                        h.do_use("arx", default_arx); continue
                     print("Usage: /use <alias> <command to launch>")
                     continue
                 if len(parts) >= 3:
                     alias = parts[1]
                     cmd = line.split(alias,1)[1].strip()
-                    h.do_use(alias, cmd); 
+                    h.do_use(alias, cmd)
                     continue
                 print("Usage: /use <alias> <command to launch>")
                 continue
@@ -132,7 +138,7 @@ Presets:
                     continue
                 alias, method = parts[1], parts[2]
                 params_json = line.split(method,1)[1].strip() if len(parts) >= 3 else "{}"
-                h.do_call(alias, method, params_json); 
+                h.do_call(alias, method, params_json)
                 continue
             if line.startswith("/scenario "):
                 parts = shlex.split(line)
@@ -150,6 +156,10 @@ Presets:
                 h.do_use("fs", default_fs); continue
             if line == "/use git":
                 h.do_use("git", default_git); continue
+            if line == "/use cal":
+                h.do_use("cal", default_cal); continue
+            if line == "/use movies":
+                h.do_use("movies", default_movies); continue
             print("Unknown command. Type /help.")
     except (KeyboardInterrupt, EOFError):
         print("\n[host] Interrumpido. Usa /exit para salir limpio la próxima vez.")
@@ -158,3 +168,4 @@ Presets:
 
 if __name__ == "__main__":
     main()
+
