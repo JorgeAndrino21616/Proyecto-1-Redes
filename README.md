@@ -1,5 +1,5 @@
 
-Se puede utilizar el bot de Groq con /llm y se usa lol para utilizar el lol-champio-builder
+Se puede utilizar el bot de Groq con /llm y se usa lol para utilizar el lol-champion-builder
 
 Ejemplo de funcionamiento:
 
