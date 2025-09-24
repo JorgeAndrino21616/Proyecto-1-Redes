@@ -75,7 +75,6 @@ def main():
     default_lol     = f"{sys.executable} {os.path.join(here, 'mcp-server.py')}"
     default_fs      = "python -m mcp_servers.filesystem"
     default_git     = "python -m mcp_servers.git"
-    default_arx   = f"{sys.executable} {os.path.join(here, 'mcp-server-compañero-2.py')}"
 
 
     try:
@@ -97,7 +96,6 @@ Presets:
   /use lol
   /use fs
   /use git
-  /use arx
 """)
                 continue
             if line == "/exit":
@@ -120,8 +118,6 @@ Presets:
                         h.do_use("fs", default_fs); continue
                     if parts[1] == "git":
                         h.do_use("git", default_git); continue
-                    if parts[1] == "arx":
-                        h.do_use("arx", default_arx); continue
                     print("Usage: /use <alias> <command to launch>")
                     continue
                 if len(parts) >= 3:
@@ -156,10 +152,6 @@ Presets:
                 h.do_use("fs", default_fs); continue
             if line == "/use git":
                 h.do_use("git", default_git); continue
-            if line == "/use cal":
-                h.do_use("cal", default_cal); continue
-            if line == "/use movies":
-                h.do_use("movies", default_movies); continue
             print("Unknown command. Type /help.")
     except (KeyboardInterrupt, EOFError):
         print("\n[host] Interrumpido. Usa /exit para salir limpio la próxima vez.")

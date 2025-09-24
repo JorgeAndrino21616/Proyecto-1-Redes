@@ -3,13 +3,32 @@ import sys
 import traceback
 import requests
 from typing import Dict, Any, Callable, List
+import os
+import certifi
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 class DDragonClient:
     def __init__(self, version="latest", lang="en_US"):
         self.version = version
         self.lang = lang
         self._bootstrapped = False
-        self.champions: Dict[str, Dict[str, Any]] = {}
+        self.champions = {}
+        self.session = requests.Session()
+        allow_insecure = os.getenv("ALLOW_INSECURE_SSL", "").lower() in ("1", "true", "yes")
+        if allow_insecure:
+            self.session.verify = False
+        else:
+            self.session.verify = certifi.where()
+        retries = Retry(
+            total=3,
+            backoff_factor=0.5,
+            status_forcelist=(429, 500, 502, 503, 504),
+            allowed_methods=frozenset(["GET"])
+        )
+        adapter = HTTPAdapter(max_retries=retries)
+        self.session.mount("https://", adapter)
+        self.session.mount("http://", adapter)
         self.items = {
             "boots_armor": "Plated Steelcaps",
             "boots_mr": "Mercury's Treads",
@@ -33,6 +52,21 @@ class DDragonClient:
             "SHARDS": ["AS", "Armor", "MR", "HP"]
         }
 
+    def _fetch_json(self, url: str):
+        resp = self.session.get(url, timeout=30)
+        resp.raise_for_status()
+        return resp.json()
+
+    def _resolve_version(self, version: str) -> str:
+        if version != "latest":
+            return version
+        try:
+            versions = self._fetch_json("https://ddragon.leagueoflegends.com/api/versions.json")
+            return versions[0] if isinstance(versions, list) and versions else "15.17.1"
+        except Exception:
+            return "15.17.1"
+
+        
     def bootstrap(self):
         ver = self._resolve_version(self.version)
         data = self._fetch_json(f"https://ddragon.leagueoflegends.com/cdn/{ver}/data/{self.lang}/champion.json")
